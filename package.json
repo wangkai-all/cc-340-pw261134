@@ -1,0 +1,23 @@
+{
+  "name": "field-relay-console",
+  "version": "0.1.0",
+  "description": "采集台：三源商品资料采集、字段裁决、部分发布与下游去重接收（全部为虚构数据）",
+  "main": "server/main.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "node server/main.js",
+    "test": "node --test tests/api.test.mjs tests/ui.test.mjs",
+    "test:api": "node --test tests/api.test.mjs",
+    "test:ui": "node --test tests/ui.test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "private": "true",
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

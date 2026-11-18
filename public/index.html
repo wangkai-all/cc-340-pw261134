@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Field Relay · 商品资料采集裁决台</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">FR</span>
+        <div>
+          <h1>Field Relay</h1>
+          <p>三源商品资料采集 · 字段级裁决台</p>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <label class="record-picker">
+          <span>记录</span>
+          <select id="record-select" aria-label="选择商品记录"></select>
+        </label>
+        <span class="env-tag" title="全部为虚构数据，供应商是本地真实 HTTP 服务">虚构演示环境</span>
+      </div>
+      <div class="topbar-actions">
+        <span class="clock" id="clock" aria-live="off"></span>
+        <button class="btn btn-quiet" id="reset-demo" type="button">重置全部</button>
+      </div>
+    </header>
+
+    <div class="banner-stack" id="banner-stack" aria-live="polite"></div>
+
+    <main>
+      <section class="panel sources-panel" aria-labelledby="sources-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="sources-title">供应方</h2>
+            <p class="panel-sub">每家都是可独立操控的真实 HTTP 服务，方言不同。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-primary" id="collect-all" type="button">采集全部字段</button>
+          </div>
+        </div>
+        <div class="source-grid" id="source-grid"></div>
+      </section>
+
+      <section class="panel priority-panel" aria-labelledby="priority-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="priority-title">优先级</h2>
+            <p class="panel-sub">拖动或使用箭头调整顺序，应用前先展示将受影响的字段。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn" id="priority-reset" type="button">恢复默认顺序</button>
+          </div>
+        </div>
+        <ol class="priority-strip" id="priority-strip"></ol>
+        <div class="priority-impact" id="priority-impact"></div>
+      </section>
+
+      <div class="workspace">
+        <section class="panel fields-panel" aria-labelledby="fields-title">
+          <div class="panel-head">
+            <div>
+              <h2 id="fields-title">字段裁决</h2>
+              <p class="panel-sub" id="fields-sub">按当前优先级逐字段选择来源。状态互不混同。</p>
+            </div>
+            <div class="panel-actions">
+              <button class="btn btn-quiet" id="toggle-raw" type="button" aria-pressed="false">显示原始帧</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="field-table">
+              <thead>
+                <tr>
+                  <th scope="col">字段</th>
+                  <th scope="col">状态</th>
+                  <th scope="col">裁决值</th>
+                  <th scope="col">采用来源</th>
+                  <th scope="col">旁证</th>
+                  <th scope="col"><span class="sr-only">操作</span></th>
+                </tr>
+              </thead>
+              <tbody id="field-rows"></tbody>
+            </table>
+          </div>
+          <div class="legend" id="legend" aria-label="状态图例"></div>
+        </section>
+
+        <aside class="side-column">
+          <section class="panel promise-panel" aria-labelledby="promise-title">
+            <div class="panel-head">
+              <div>
+                <h2 id="promise-title">完整性承诺</h2>
+                <p class="panel-sub">承诺由当前裁决实时计算，不由页面口径改写。</p>
+              </div>
+            </div>
+            <div id="promise-body"></div>
+          </section>
+
+          <section class="panel publish-panel" aria-labelledby="publish-title">
+            <div class="panel-head">
+              <div>
+                <h2 id="publish-title">发布与投递</h2>
+                <p class="panel-sub">发布冻结当版状态；旧版逐版可追溯。</p>
+              </div>
+            </div>
+            <div id="publish-body"></div>
+          </section>
+
+          <section class="panel receiver-panel" aria-labelledby="receiver-title">
+            <div class="panel-head">
+              <div>
+                <h2 id="receiver-title">下游接收端</h2>
+                <p class="panel-sub">会复核完整性承诺，并按幂等键拒绝重复入库。</p>
+              </div>
+            </div>
+            <div id="receiver-body"></div>
+          </section>
+        </aside>
+      </div>
+
+      <div class="trail-grid">
+        <section class="panel raw-panel" aria-labelledby="raw-title">
+          <div class="panel-head">
+            <div>
+              <h2 id="raw-title">原始响应</h2>
+              <p class="panel-sub">每次请求都留存，失败响应也在内。点击展开原文。</p>
+            </div>
+            <span class="count-pill" id="raw-count">0</span>
+          </div>
+          <ol class="raw-list" id="raw-list"></ol>
+        </section>
+
+        <section class="panel event-panel" aria-labelledby="event-title">
+          <div class="panel-head">
+            <div>
+              <h2 id="event-title">操作痕迹</h2>
+              <p class="panel-sub">采集、换序、修订、发布、投递。</p>
+            </div>
+          </div>
+          <ol class="event-list" id="event-list"></ol>
+        </section>
+      </div>
+
+      <section class="panel scenario-panel" aria-labelledby="scenario-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="scenario-title">演示脚本</h2>
+            <p class="panel-sub">每段都触发真实请求与页面更新，可在运行中观察。</p>
+          </div>
+          <span class="scenario-status" id="scenario-status"></span>
+        </div>
+        <div class="scenario-grid" id="scenario-grid"></div>
+      </section>
+    </main>
+
+    <dialog class="confirm-dialog" id="partial-dialog">
+      <form method="dialog">
+        <h2>发布部分结果</h2>
+        <p id="partial-summary"></p>
+        <label class="dialog-note">
+          <span>发布备注（可选）</span>
+          <input id="partial-note" type="text" maxlength="140" placeholder="例如：等待 Aurora 恢复后补采标题" />
+        </label>
+        <p class="dialog-warning">
+          该版本会以「部分」承诺冻结，未确认的必填字段不会出现在 payload 中，下游会显示仍在等待。
+        </p>
+        <div class="dialog-actions">
+          <button class="btn" value="cancel" type="submit">取消</button>
+          <button class="btn btn-warn" id="partial-confirm" value="confirm" type="submit">确认发布部分版</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
